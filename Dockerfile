@@ -1,12 +1,21 @@
-FROM golang:1.7-alpine
+FROM golang:alpine as builder
 
-ADD . /home
-        
-WORKDIR /home
+RUN apk update && \
+    apk add --no-cache git
 
-RUN \
-       apk add --no-cache bash git openssh && \
-       go get -u github.com/minio/minio-go 
-       
+ENV GO111MODULE=on
 
-CMD ["go","run","sample.go"]
+WORKDIR /go/src/github.com/gobuffalo/gobuffalo/
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o /bin/app .
+
+FROM alpine
+RUN apk add --no-cache bash  --no-cache ca-certificates  rm -rf /var/cache/apk/*
+
+COPY --from=builder /bin/app /bin/app
+
+EXPOSE 3000
+
+CMD ["/bin/app"]
