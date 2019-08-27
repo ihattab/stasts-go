@@ -9,8 +9,6 @@ registry-service:
   image: *registry_image
   container_name: 'registry-999-99-service'
   restart: 'always'
-  volumes_from:
-    - *dvc
   environment:
     SETTINGS_FLAVOR: 'local'
     STORAGE_PATH: *datapath
