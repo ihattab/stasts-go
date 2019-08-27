@@ -1,5 +1,9 @@
-FROM alpine:3.4
+FROM tecadmin/ubuntu-ssh:16.04
 
-RUN apk update
-RUN apk add vim
-RUN apk add curl
+RUN apt-get update \
+   && apt-get install -y apache2
+
+COPY index.html /var/www/html/
+WORKDIR /var/www/html
+CMD ["apachectl", "-D", "FOREGROUND"]
+EXPOSE 80
