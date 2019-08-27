@@ -1,24 +1,12 @@
-#
-# Go Dockerfile
-#
-# https://github.com/dockerfile/go
-#
+FROM golang:1.7-alpine
 
-# Pull base image.
-FROM dockerfile/ubuntu
+ADD . /home
+        
+WORKDIR /home
 
-# Install Go
 RUN \
-  mkdir -p /goroot && \
-  curl https://storage.googleapis.com/golang/go1.4.2.linux-amd64.tar.gz | tar xvzf - -C /goroot --strip-components=1
+       apk add --no-cache bash git openssh && \
+       go get -u github.com/minio/minio-go 
+       
 
-# Set environment variables.
-ENV GOROOT /goroot
-ENV GOPATH /gopath
-ENV PATH $GOROOT/bin:$GOPATH/bin:$PATH
-
-# Define working directory.
-WORKDIR /gopath
-
-# Define default command.
-CMD ["bash"]
+CMD ["go","run","sample.go"]
