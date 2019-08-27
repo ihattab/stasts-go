@@ -1,30 +1,10 @@
-version: '3.3'
-
+version: '3'
 services:
-  photoprism:
-    container_name: ${PHOTOPRISM_CONTAINER_NAME}
-    build: .
+  stats-go:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stats-go
+    image: stats-go
     ports:
-      - ${PHOTOPRISM_PORT}:80 # Web Server (PhotoPrism)
-  #    - ${DATABASE_PORT}:4000 # Database (MySQL compatible)
-    volumes:
-      - .:/go/src/github.com/photoprism/photoprism
-    environment:
-      PHOTOPRISM_DEBUG: "true"
-      PHOTOPRISM_SERVER_MODE: "debug"
-      PHOTOPRISM_ASSETS_PATH: "/go/src/github.com/photoprism/photoprism/assets"
-      PHOTOPRISM_CACHE_PATH: "/go/src/github.com/photoprism/photoprism/assets/cache"
-      PHOTOPRISM_IMPORT_PATH: "/go/src/github.com/photoprism/photoprism/assets/photos/import"
-      PHOTOPRISM_EXPORT_PATH: "/go/src/github.com/photoprism/photoprism/assets/photos/export"
-      PHOTOPRISM_ORIGINALS_PATH: "/go/src/github.com/photoprism/photoprism/assets/photos/originals"
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: ${PHPMYADMIN_CONTAINER_NAME}
-    depends_on:
-      - photoprism
-    environment:
-      - PMA_HOST=photoprism
-      - PMA_PORT=4000
-    restart: always
-    ports:
-      - ${PHPMYADMIN_PORT}:80
+      - "9900:3000"
