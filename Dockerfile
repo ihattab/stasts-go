@@ -1,9 +1,4 @@
+FROM tianon/true
 
-
-FROM photoprism/development:20181219 
-
-# Set up project directory 
-WORKDIR "/go/src/github.com/photoprism/photoprism" 
-COPY . .
-
-
+VOLUME ["/usr/share/nginx/html/"] 
+ADD index.html /usr/share/nginx/html/
