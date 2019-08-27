@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      container_name: stats-go
+    container_name: stats-go
     image: stats-go
     ports:
       - "9900:3000"
