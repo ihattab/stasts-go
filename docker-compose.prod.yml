@@ -1,0 +1,27 @@
+version: '3'
+services:
+  jitsi-meet-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: webtv/jitsi-meet-api
+    container_name: jitsi-meet-api
+    ports:
+      - "9998:8095"
+    volumes:
+      - ${WEBINAR_HTDOCS}:${WEBINAR_HTDOCS}
+      - /var/run/mysqld/mysqld.sock:/var/run/mysqld/mysqld.sock:ro
+      - /var/www/webinar-recordings/:/var/www/webinar-recordings/
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      WEBINAR_RECORDINGS_DIRECTORY: /var/www/webinar-recordings/
+      PIPER_UPLOAD_ENDPOINT: https://processing-piper-beta.webtv-solution.com/api/assets/upload
+      PIPER_TRANSCODE_ENDPOINT: https://processing-piper-beta.webtv-solution.com/api/transcode
+    restart: always
+    networks:
+      meet.jitsi:
+
+networks:
+  meet.jitsi:
+    external: true
