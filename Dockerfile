@@ -1,4 +1,4 @@
-FROM tianon/true
+FROM golang:alpine as builder
 
-VOLUME ["/usr/share/nginx/html/"] 
-ADD index.html /usr/share/nginx/html/
+RUN apk update && \
+    apk add --no-cache git
