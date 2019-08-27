@@ -1,38 +1,34 @@
-FROM ubuntu:16.04
+# pull repository
+FROM alpine/git AS git-clone
+RUN mkdir -p /app/src && \
+    git clone https://github.com/vijos/vj4.git /app/src
 
-COPY package.json ./
+# `stage-node` generates some files
+FROM node:8-stretch AS stage-node
+COPY --from=git-clone /app/src /app/src
+WORKDIR /app/src
 
-RUN apt-get update -y && \
-    apt-get install -yqq \
-        python \
-        build-essential \
-        apt-transport-https \
-        ca-certificates \
-        curl \
-        locales \
-        nodejs \
-        npm \
-        nodejs-legacy \
-        sudo \
-        git
+RUN npm install \
+    && npm run build:production
 
-## NodeJS and MeteorJS
-RUN curl -sL https://deb.nodesource.com/setup_4.x | bash -
-RUN curl https://install.meteor.com/ | sh
+# main
+FROM python:3.6-alpine3.9
+COPY --from=stage-node /app/src/vj4 /app/vj4
+COPY --from=stage-node /app/src/LICENSE /app/src/README.md /app/src/requirements.txt /app/src/setup.py /app/
+WORKDIR /app
 
-## Dependencies
-RUN npm install -g eslint eslint-plugin-react
-RUN npm install
+RUN apk add --no-cache libmaxminddb \
+        libmaxminddb-dev alpine-sdk git && \
+    python -m pip install -r requirements.txt && \
+    apk del --no-cache --purge \
+        libmaxminddb-dev alpine-sdk git && \
+    curl "http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz" | gunzip -c > GeoLite2-City.mmdb
 
-## Locale
-ENV OS_LOCALE="en_US.UTF-8"
-RUN locale-gen ${OS_LOCALE}
-ENV LANG=${OS_LOCALE} LANGUAGE=en_US:en LC_ALL=${OS_LOCALE}
+ENV GIT_PYTHON_REFRESH=quiet
+ENV VJ_LISTEN=http://0.0.0.0:8888
 
-## User
-RUN useradd ubuntu && \
-    usermod -aG sudo ubuntu && \
-    mkdir -p /builds/core/.meteor /home/ubuntu && \
-    chown -Rh ubuntu:ubuntu /builds/core/.meteor && \
-    chown -Rh ubuntu:ubuntu /home/ubuntu
-USER ubuntu
+ADD docker-entrypoint.py /app/
+ENTRYPOINT [ "python", "docker-entrypoint.py" ]
+
+EXPOSE 8888
+CMD [ "vj4.server" ]
