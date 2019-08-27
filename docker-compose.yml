@@ -1,6 +1,10 @@
-version: '2'
+version: '3'
 services:
-  sample-go:
-    build: ./sample
-    environment:
-      - TEST_ENV=test
+  stats-go:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stats-go
+    image: stats-go
+    ports:
+      - "9900:3000"
