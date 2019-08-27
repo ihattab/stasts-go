@@ -1,9 +1,2 @@
-FROM tecadmin/ubuntu-ssh:16.04
-
-RUN apt-get update \
-   && apt-get install -y apache2
-
-COPY index.html /var/www/html/
-WORKDIR /var/www/html
-CMD ["apachectl", "-D", "FOREGROUND"]
-EXPOSE 80
+$ curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+$ chmod +x /usr/local/bin/docker-compose
